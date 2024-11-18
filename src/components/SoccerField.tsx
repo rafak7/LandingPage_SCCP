@@ -189,14 +189,14 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
           </div>
         </div>
 
-        {/* Reservas - ajustando para layout horizontal em mobile */}
-        <div className="w-full lg:w-64 bg-black/30 rounded-lg p-4">
-          <h3 className="text-white font-medium mb-4">Reservas</h3>
-          <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+        {/* Reservas */}
+        <div className="w-full lg:w-72 bg-black rounded-lg p-4 shadow-xl">
+          <h3 className="text-white font-medium mb-4 border-b border-white/10 pb-2">Reservas</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
             {bench.map((player) => (
               <div
                 key={player.id}
-                className="flex-shrink-0 bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-move"
+                className="flex-shrink-0 bg-zinc-900 rounded-lg p-2 hover:bg-zinc-800 transition-colors cursor-move border border-zinc-800 hover:border-zinc-700"
                 draggable
                 onDragStart={(e) => handleDragStart(player, e)}
                 onClick={() => handlePlayerClick(player)}
@@ -204,6 +204,7 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
                 <PlayerToken 
                   player={player} 
                   isSelected={selectedPlayer?.id === player.id}
+                  compact
                 />
               </div>
             ))}
@@ -214,18 +215,17 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
   );
 }
 
-function PlayerToken({ player, isSelected }: { player: Player; isSelected?: boolean }) {
+function PlayerToken({ player, isSelected, compact }: { player: Player; isSelected?: boolean; compact?: boolean }) {
   return (
     <div className={`flex items-center space-x-2 ${isSelected ? 'ring-2 ring-yellow-400 rounded-lg p-1' : ''}`}>
-      <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full ${
+      <div className={`${compact ? 'w-6 h-6' : 'w-6 h-6 md:w-8 md:h-8'} rounded-full ${
         isSelected ? 'bg-yellow-400' : 'bg-white/90'
-      } flex items-center justify-center text-black font-bold text-sm md:text-base`}>
+      } flex items-center justify-center text-black font-bold ${compact ? 'text-sm' : 'text-sm md:text-base'}`}>
         {player.number}
       </div>
-      <div className="text-xs md:text-sm text-white font-medium">
+      <div className={`${compact ? 'text-xs' : 'text-xs md:text-sm'} text-white font-medium truncate`}>
         {player.name}
       </div>
     </div>
   );
 }
-

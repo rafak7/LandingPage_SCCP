@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/client';
 import { Team } from '../types';
-import { Trophy, Star, Calendar, Users } from 'lucide-react';
+import { Trophy, Star, Calendar, Users, ShieldCheck } from 'lucide-react';
 import CountUp from 'react-countup';
 import { SoccerField } from './SoccerField';
 
@@ -108,7 +108,10 @@ export function TeamInfo() {
       </div>
 
       <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Elenco</h2>
+        <h2 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2 font-display">
+          <ShieldCheck className="w-6 h-6 text-primary" />
+          <span>Elenco</span>
+        </h2>
         <SoccerField lineup={fullSquad} />
       </div>
     </div>
