@@ -4,8 +4,44 @@ import { api } from '../api/client';
 import { Team } from '../types';
 import { Trophy, Star, Calendar, Users } from 'lucide-react';
 import CountUp from 'react-countup';
+import { SoccerField } from './SoccerField';
 
 const CORINTHIANS_ID = 65; // Updated to correct Corinthians ID
+
+const fullSquad = [
+  // Titulares
+  { id: '1', number: "1", name: "Hugo Souza", position: "GK", starter: true },
+  { id: '2', number: "2", name: "Matheuzinho", position: "RB", starter: true },
+  { id: '3', number: "25", name: "Cacá", position: "CB1", starter: true },
+  { id: '4', number: "5", name: "André Ramalho", position: "CB2", starter: true },
+  { id: '5', number: "21", name: "Matheus Bidu", position: "LB", starter: true },
+  { id: '6', number: "80", name: "Alex Santana", position: "DM", starter: true },
+  { id: '7', number: "19", name: "André Carrillo", position: "CM", starter: true },
+  { id: '8', number: "10", name: "Rodrigo Garro", position: "AM", starter: true },
+  { id: '9', number: "94", name: "Memphis", position: "RW", starter: true },
+  { id: '10', number: "9", name: "Yuri Alberto", position: "CF", starter: true },
+  { id: '11', number: "11", name: "Ángel Romero", position: "LW", starter: true },
+  
+  // Reservas
+  { id: '12', number: "32", name: "M. Donelli", position: "GK", starter: false },
+  { id: '13', number: "13", name: "Gustavo Henrique", position: "CB", starter: false },
+  { id: '14', number: "3", name: "Félix Torres", position: "CB", starter: false },
+  { id: '15', number: "35", name: "Leo Mana", position: "RB", starter: false },
+  { id: '16', number: "46", name: "Hugo", position: "LB", starter: false },
+  { id: '17', number: "8", name: "Charles", position: "CM", starter: false },
+  { id: '18', number: "27", name: "Breno Bidon", position: "CM", starter: false },
+  { id: '19', number: "77", name: "Igor Coronado", position: "AM", starter: false },
+  { id: '20', number: "7", name: "Maycon", position: "CM", starter: false },
+  { id: '21', number: "14", name: "Raniele", position: "DM", starter: false },
+  { id: '22', number: "30", name: "Matheus Araújo", position: "AM", starter: false },
+  { id: '23', number: "33", name: "Ruan Oliveira", position: "CM", starter: false },
+  { id: '24', number: "17", name: "Giovane", position: "LW", starter: false },
+  { id: '25', number: "22", name: "Héctor Hernández", position: "ST", starter: false },
+  { id: '26', number: "16", name: "Pedro Henrique", position: "CF", starter: false },
+  { id: '27', number: "20", name: "Pedro Raul", position: "CF", starter: false },
+  { id: '28', number: "43", name: "Talles Magno", position: "LW", starter: false },
+  { id: '29', number: "70", name: "José Martínez", position: "DM", starter: false },
+];
 
 export function TeamInfo() {
   const { data: team, isLoading } = useQuery<Team>({
@@ -69,6 +105,11 @@ export function TeamInfo() {
             />
           </div>
         </div>
+      </div>
+
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Elenco</h2>
+        <SoccerField lineup={fullSquad} />
       </div>
     </div>
   );

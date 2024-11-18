@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export function Header() {
   return (
@@ -6,9 +7,9 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center h-20">          
           <nav className="hidden md:flex items-center space-x-8">
-            <NavLink href="#team">Time</NavLink>
-            <NavLink href="#matches">Partidas</NavLink>
-            <NavLink href="#news">Notícias</NavLink>
+            <NavLink to="/team">Time</NavLink>
+            <NavLink to="/matches">Partidas</NavLink>
+            <NavLink to="/news">Notícias</NavLink>
           </nav>
         </div>
       </div>
@@ -16,13 +17,13 @@ export function Header() {
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
-    <a
-      href={href}
+    <Link
+      to={to}
       className="text-gray-300 hover:text-white transition-colors duration-200 text-sm uppercase tracking-wider"
     >
       {children}
-    </a>
+    </Link>
   );
 }
