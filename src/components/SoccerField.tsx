@@ -115,9 +115,9 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Campo */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div 
             className="relative w-full aspect-[16/10] bg-gradient-to-b from-green-800 to-green-600 rounded-lg overflow-hidden"
             onDragOver={handleDragOver}
@@ -152,7 +152,7 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
                   key={player.id}
                   className={`absolute cursor-move transition-all duration-75 ${
                     draggedPlayer?.id === player.id ? 'opacity-50' : ''
-                  }`}
+                  } scale-[0.85] md:scale-100`}
                   style={{
                     left: `${position.x}%`,
                     top: `${position.y}%`,
@@ -189,14 +189,14 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
           </div>
         </div>
 
-        {/* Reservas */}
-        <div className="w-64 bg-black/30 rounded-lg p-4">
+        {/* Reservas - ajustando para layout horizontal em mobile */}
+        <div className="w-full lg:w-64 bg-black/30 rounded-lg p-4">
           <h3 className="text-white font-medium mb-4">Reservas</h3>
-          <div className="space-y-2">
+          <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
             {bench.map((player) => (
               <div
                 key={player.id}
-                className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-move"
+                className="flex-shrink-0 bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-move"
                 draggable
                 onDragStart={(e) => handleDragStart(player, e)}
                 onClick={() => handlePlayerClick(player)}
@@ -217,10 +217,12 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
 function PlayerToken({ player, isSelected }: { player: Player; isSelected?: boolean }) {
   return (
     <div className={`flex items-center space-x-2 ${isSelected ? 'ring-2 ring-yellow-400 rounded-lg p-1' : ''}`}>
-      <div className={`w-8 h-8 rounded-full ${isSelected ? 'bg-yellow-400' : 'bg-white/90'} flex items-center justify-center text-black font-bold`}>
+      <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full ${
+        isSelected ? 'bg-yellow-400' : 'bg-white/90'
+      } flex items-center justify-center text-black font-bold text-sm md:text-base`}>
         {player.number}
       </div>
-      <div className="text-sm text-white font-medium">
+      <div className="text-xs md:text-sm text-white font-medium">
         {player.name}
       </div>
     </div>
