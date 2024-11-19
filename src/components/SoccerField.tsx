@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import html2canvas from 'html2canvas';
 
 interface Player {
   id: string;
@@ -6,6 +8,16 @@ interface Player {
   name: string;
   position: string;
   starter: boolean;
+}
+
+interface NextMatch {
+  partida_id: number;
+  time_mandante: {
+    nome_popular: string;
+  };
+  time_visitante: {
+    nome_popular: string;
+  };
 }
 
 const positions: Record<string, { x: number; y: number }> = {
@@ -31,6 +43,7 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
   const [draggedPlayer, setDraggedPlayer] = useState<Player | null>(null);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [nextMatch, setNextMatch] = useState<NextMatch | null>(null);
 
   const starters = lineup.filter(player => player.starter);
   const bench = lineup.filter(player => !player.starter);
@@ -139,6 +152,247 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     handleDragEnd();
   };
 
+  const fetchNextMatch = async () => {
+    try {
+      const response = await axios.get(
+        'https://api.api-futebol.com.br/v1/times/702/partidas/proximas',
+        {
+          headers: {
+            'Authorization': 'Bearer live_2d128aee9853eda80ea32f84798a38'
+          }
+        }
+      );
+      
+      if (response.data && response.data.length > 0) {
+        setNextMatch(response.data[0]); // Pega o primeiro jogo da lista
+        console.log('Próximo jogo:', response.data[0]); // Para debug
+      }
+    } catch (error) {
+      console.error('Erro ao buscar próximo jogo:', error);
+      showError('Erro ao buscar informações do próximo jogo');
+    }
+  };
+
+  useEffect(() => {
+    fetchNextMatch();
+  }, []);
+
+  const handlePrint = () => {
+    const printContainer = document.createElement('div');
+    printContainer.style.position = 'absolute';
+    printContainer.style.left = '-9999px';
+    printContainer.style.width = '1200px';
+    printContainer.style.height = '630px';
+    printContainer.style.background = 'linear-gradient(to bottom, #000000, #18181b)';
+    printContainer.style.padding = '20px';
+    printContainer.style.display = 'flex';
+    printContainer.style.flexDirection = 'column';
+    printContainer.style.alignItems = 'center';
+    printContainer.style.gap = '16px';
+
+    // Adicionar o título
+    const title = document.createElement('h1');
+    title.textContent = `ESSA É MINHA ESCALAÇÃO PARA O JOGO CONTRA ${
+      nextMatch ? 
+        (nextMatch.time_mandante.nome_popular === 'Seu Time' ? 
+          nextMatch.time_visitante.nome_popular.toUpperCase() : 
+          nextMatch.time_mandante.nome_popular.toUpperCase()) :
+        'O PRÓXIMO ADVERSÁRIO'
+    }`;
+    title.style.color = '#ffffff';
+    title.style.fontSize = '28px';
+    title.style.fontWeight = 'bold';
+    title.style.textAlign = 'center';
+    title.style.fontFamily = 'Arial, sans-serif';
+    title.style.marginBottom = '10px';
+    title.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    title.style.padding = '0 20px';
+    printContainer.appendChild(title);
+
+    // Criar um novo container para o campo
+    const fieldContainer = document.createElement('div');
+    fieldContainer.style.width = '1100px';
+    fieldContainer.style.height = '500px';
+    fieldContainer.style.position = 'relative';
+    fieldContainer.style.margin = '0 auto';
+    
+    // Criar o campo diretamente (em vez de clonar)
+    const field = document.createElement('div');
+    field.style.width = '100%';
+    field.style.height = '100%';
+    field.style.position = 'relative';
+    field.style.backgroundColor = 'black';
+    field.style.backgroundImage = 'linear-gradient(to bottom, #18181b, #000000)';
+    field.style.borderRadius = '12px';
+    field.style.overflow = 'hidden';
+
+    // Adicionar as linhas do campo
+    field.innerHTML = `
+      <div style="position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.5);"></div>
+      <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.5);"></div>
+      <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 144px; height: 144px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%;"></div>
+      <div style="position: absolute; top: 50%; transform: translateY(-50%); left: 0; width: 96px; height: 192px; border: 2px solid rgba(255,255,255,0.5);"></div>
+      <div style="position: absolute; top: 50%; transform: translateY(-50%); right: 0; width: 96px; height: 192px; border: 2px solid rgba(255,255,255,0.5);"></div>
+    `;
+
+    // Adicionar os jogadores
+    starters.forEach(player => {
+      let position = { x: 50, y: 50 };
+      
+      if (player.position.startsWith('CUSTOM_')) {
+        const [, x, y] = player.position.split('_');
+        position = { x: Number(x), y: Number(y) };
+      } else {
+        position = positions[player.position] || { x: 50, y: 50 };
+      }
+
+      const playerElement = document.createElement('div');
+      playerElement.style.position = 'absolute';
+      playerElement.style.left = `${position.x}%`;
+      playerElement.style.top = `${position.y}%`;
+      playerElement.style.transform = 'translate(-50%, -50%)';
+      
+      const playerToken = document.createElement('div');
+      playerToken.style.display = 'flex';
+      playerToken.style.alignItems = 'center';
+      playerToken.style.gap = '8px';
+
+      const numberCircle = document.createElement('div');
+      numberCircle.style.width = '32px';
+      numberCircle.style.height = '32px';
+      numberCircle.style.borderRadius = '50%';
+      numberCircle.style.backgroundColor = 'white';
+      numberCircle.style.display = 'flex';
+      numberCircle.style.alignItems = 'center';
+      numberCircle.style.justifyContent = 'center';
+      numberCircle.style.fontWeight = 'bold';
+      numberCircle.style.color = 'black';
+      numberCircle.textContent = player.number;
+
+      const playerName = document.createElement('div');
+      playerName.style.color = 'white';
+      playerName.style.fontSize = '14px';
+      playerName.style.fontWeight = '500';
+      playerName.textContent = player.name;
+
+      playerToken.appendChild(numberCircle);
+      playerToken.appendChild(playerName);
+      playerElement.appendChild(playerToken);
+      field.appendChild(playerElement);
+    });
+
+    fieldContainer.appendChild(field);
+    printContainer.appendChild(fieldContainer);
+
+    // Adicionar marca d'água
+    const watermark = document.createElement('div');
+    watermark.textContent = 'selectsccp.com';
+    watermark.style.color = 'rgba(255,255,255,0.5)';
+    watermark.style.fontSize = '16px';
+    watermark.style.position = 'absolute';
+    watermark.style.bottom = '10px';
+    watermark.style.right = '20px';
+    watermark.style.fontFamily = 'Arial, sans-serif';
+    printContainer.appendChild(watermark);
+
+    // Adicionar ao body temporariamente
+    document.body.appendChild(printContainer);
+
+    // Usar html2canvas para criar a imagem
+    html2canvas(printContainer, {
+      backgroundColor: '#000000',
+      scale: 2,
+      logging: false,
+      width: 1200,
+      height: 630,
+      allowTaint: true,
+      useCORS: true,
+    }).then(canvas => {
+      // Remover o container temporário
+      document.body.removeChild(printContainer);
+
+      // Criar o modal para preview
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+      modal.style.display = 'flex';
+      modal.style.flexDirection = 'column';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.padding = '20px';
+      modal.style.zIndex = '9999';
+
+      // Adicionar preview da imagem
+      const preview = canvas;
+      preview.style.maxWidth = '90%';
+      preview.style.maxHeight = '80vh';
+      preview.style.borderRadius = '12px';
+      preview.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+      modal.appendChild(preview);
+
+      // Container para os botões
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.gap = '12px';
+      buttonContainer.style.marginTop = '20px';
+
+      // Botão de download
+      const downloadButton = document.createElement('button');
+      downloadButton.textContent = 'Baixar Imagem';
+      downloadButton.style.backgroundColor = '#18181b';
+      downloadButton.style.color = 'white';
+      downloadButton.style.padding = '12px 24px';
+      downloadButton.style.border = '1px solid #27272a';
+      downloadButton.style.borderRadius = '8px';
+      downloadButton.style.cursor = 'pointer';
+      downloadButton.style.fontSize = '16px';
+      downloadButton.style.fontWeight = 'bold';
+      downloadButton.onclick = () => {
+        const link = document.createElement('a');
+        link.download = 'minha-escalacao.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+
+      // Botão de fechar
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'Fechar';
+      closeButton.style.backgroundColor = '#27272a';
+      closeButton.style.color = 'white';
+      closeButton.style.padding = '12px 24px';
+      closeButton.style.border = '1px solid #3f3f46';
+      closeButton.style.borderRadius = '8px';
+      closeButton.style.cursor = 'pointer';
+      closeButton.style.fontSize = '16px';
+      closeButton.style.fontWeight = 'bold';
+      closeButton.onclick = () => document.body.removeChild(modal);
+
+      buttonContainer.appendChild(downloadButton);
+      buttonContainer.appendChild(closeButton);
+      modal.appendChild(buttonContainer);
+      document.body.appendChild(modal);
+
+      // Adicionar hover effects nos botões
+      [downloadButton, closeButton].forEach(button => {
+        button.addEventListener('mouseover', () => {
+          button.style.opacity = '0.9';
+          button.style.transform = 'translateY(-1px)';
+          button.style.backgroundColor = '#27272a';
+        });
+        button.addEventListener('mouseout', () => {
+          button.style.opacity = '1';
+          button.style.transform = 'translateY(0)';
+          button.style.backgroundColor = button === downloadButton ? '#18181b' : '#27272a';
+        });
+        button.style.transition = 'all 0.2s ease';
+      });
+    });
+  };
+
   return (
     <div className="space-y-4">
       {errorMessage && (
@@ -146,9 +400,18 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
           {errorMessage}
         </div>
       )}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handlePrint}
+          className="bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-lg 
+                   shadow-lg transition-colors border border-zinc-800 hover:border-zinc-700"
+        >
+          Compartilhar Escalação
+        </button>
+      </div>
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Campo */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 soccer-field-container">
           <div 
             className="relative w-full aspect-[16/10] bg-gradient-to-b from-zinc-900 to-black rounded-lg overflow-hidden"
             onDragOver={handleDragOver}
