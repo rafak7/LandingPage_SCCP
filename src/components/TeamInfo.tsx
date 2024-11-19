@@ -5,6 +5,7 @@ import { Team } from '../types';
 import { Trophy, Star, Calendar, Users, ShieldCheck } from 'lucide-react';
 import CountUp from 'react-countup';
 import { SoccerField } from './SoccerField';
+import { useNavigate } from 'react-router-dom';
 
 const CORINTHIANS_ID = 65; // Updated to correct Corinthians ID
 
@@ -44,6 +45,8 @@ const fullSquad = [
 ];
 
 export function TeamInfo() {
+  const navigate = useNavigate();
+
   const { data: team, isLoading } = useQuery<Team>({
     queryKey: ['team'],
     queryFn: async () => {
@@ -81,6 +84,14 @@ export function TeamInfo() {
         <div className="flex-1 text-center md:text-left">
           <h1 className="text-4xl font-bold mb-4">{team?.nome_popular}</h1>
           <p className="text-gray-400 mb-6">Fundado em 1910{team?.fundacao}</p>
+
+          <button
+            onClick={() => navigate(`/matches/${CORINTHIANS_ID}`)}
+            className="mb-8 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors flex items-center gap-2"
+          >
+            <Calendar className="w-4 h-4" />
+            Ver Próximas Partidas
+          </button>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Stat

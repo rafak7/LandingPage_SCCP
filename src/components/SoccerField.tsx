@@ -30,9 +30,15 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [draggedPlayer, setDraggedPlayer] = useState<Player | null>(null);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const starters = lineup.filter(player => player.starter);
   const bench = lineup.filter(player => !player.starter);
+
+  const showError = (message: string) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 3000);
+  };
 
   const handlePlayerClick = (player: Player) => {
     if (!selectedPlayer) {
@@ -44,6 +50,16 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     if (selectedPlayer.id === player.id) {
       setSelectedPlayer(null);
       return;
+    }
+
+    // Se está tentando colocar um reserva em campo, verifica o limite de 11 jogadores
+    if (!selectedPlayer.starter && player.starter) {
+      const currentStarters = lineup.filter(p => p.starter).length;
+      if (currentStarters >= 11) {
+        showError('Máximo de 11 jogadores em campo atingido!');
+        setSelectedPlayer(null);
+        return;
+      }
     }
 
     // Troca os jogadores e suas posições
@@ -98,6 +114,16 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     e.preventDefault();
     if (!draggedPlayer || !dragPosition) return;
 
+    // Se o jogador não é titular e está sendo arrastado para o campo
+    if (!draggedPlayer.starter) {
+      const currentStarters = lineup.filter(p => p.starter).length;
+      if (currentStarters >= 11) {
+        showError('Máximo de 11 jogadores em campo atingido!');
+        handleDragEnd();
+        return;
+      }
+    }
+
     const updatedLineup = lineup.map(p => {
       if (p.id === draggedPlayer.id) {
         return { 
@@ -115,6 +141,11 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
 
   return (
     <div className="space-y-4">
+      {errorMessage && (
+        <div className="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in-out">
+          {errorMessage}
+        </div>
+      )}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Campo */}
         <div className="flex-1 min-w-0">
