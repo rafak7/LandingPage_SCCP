@@ -119,7 +119,7 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
         {/* Campo */}
         <div className="flex-1 min-w-0">
           <div 
-            className="relative w-full aspect-[16/10] bg-gradient-to-b from-green-800 to-green-600 rounded-lg overflow-hidden"
+            className="relative w-full aspect-[16/10] bg-gradient-to-b from-zinc-900 to-black rounded-lg overflow-hidden"
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
             onDrop={handleDrop}
@@ -141,7 +141,7 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
               if (draggedPlayer?.id === player.id && dragPosition) {
                 position = dragPosition;
               } else if (player.position.startsWith('CUSTOM_')) {
-                const [_, x, y] = player.position.split('_');
+                const [, x, y] = player.position.split('_');
                 position = { x: Number(x), y: Number(y) };
               } else {
                 position = positions[player.position] || { x: 50, y: 50 };

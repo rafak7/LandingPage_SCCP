@@ -107,7 +107,7 @@ export function TeamInfo() {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6 flex items-center justify-center gap-2 font-display">
           <ShieldCheck className="w-6 h-6 text-primary" />
           <span>Elenco</span>
