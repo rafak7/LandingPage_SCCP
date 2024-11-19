@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
+import { useQuery } from '@tanstack/react-query';
 
 interface Player {
   id: string;
@@ -10,14 +11,16 @@ interface Player {
   starter: boolean;
 }
 
-interface NextMatch {
-  partida_id: number;
-  time_mandante: {
-    nome_popular: string;
-  };
-  time_visitante: {
-    nome_popular: string;
-  };
+interface NextMatchResponse {
+  'campeonato-brasileiro': Array<{
+    partida_id: number;
+    time_mandante: {
+      nome_popular: string;
+    };
+    time_visitante: {
+      nome_popular: string;
+    };
+  }>;
 }
 
 const positions: Record<string, { x: number; y: number }> = {
@@ -43,7 +46,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
   const [draggedPlayer, setDraggedPlayer] = useState<Player | null>(null);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [nextMatch, setNextMatch] = useState<NextMatch | null>(null);
 
   const starters = lineup.filter(player => player.starter);
   const bench = lineup.filter(player => !player.starter);
@@ -152,30 +154,14 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     handleDragEnd();
   };
 
-  const fetchNextMatch = async () => {
-    try {
-      const response = await axios.get(
-        'https://api.api-futebol.com.br/v1/times/702/partidas/proximas',
-        {
-          headers: {
-            'Authorization': 'Bearer live_2d128aee9853eda80ea32f84798a38'
-          }
-        }
-      );
-      
-      if (response.data && response.data.length > 0) {
-        setNextMatch(response.data[0]); // Pega o primeiro jogo da lista
-        console.log('Próximo jogo:', response.data[0]); // Para debug
-      }
-    } catch (error) {
-      console.error('Erro ao buscar próximo jogo:', error);
-      showError('Erro ao buscar informações do próximo jogo');
-    }
-  };
-
-  useEffect(() => {
-    fetchNextMatch();
-  }, []);
+  const { data: nextMatch } = useQuery<NextMatchResponse>({
+    queryKey: ['nextMatch'],
+    queryFn: async () => {
+      const { data } = await axios.get('/times/702/partidas/proximas');
+      return data;
+    },
+    staleTime: 1000 * 60 * 15,
+  });
 
   const handlePrint = () => {
     const printContainer = document.createElement('div');
@@ -190,15 +176,16 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     printContainer.style.alignItems = 'center';
     printContainer.style.gap = '16px';
 
-    // Adicionar o título
+    // Adicionar o título com verificação segura
     const title = document.createElement('h1');
-    title.textContent = `ESSA É MINHA ESCALAÇÃO PARA O JOGO CONTRA ${
-      nextMatch ? 
-        (nextMatch.time_mandante.nome_popular === 'Seu Time' ? 
-          nextMatch.time_visitante.nome_popular.toUpperCase() : 
-          nextMatch.time_mandante.nome_popular.toUpperCase()) :
-        'O PRÓXIMO ADVERSÁRIO'
-    }`;
+    const titleText = nextMatch?.['campeonato-brasileiro']?.[0]?.time_visitante?.nome_popular ? 
+      `ESSA É MINHA ESCALAÇÃO PARA O JOGO CONTRA O ${nextMatch['campeonato-brasileiro'][0].time_visitante.nome_popular.toUpperCase()}` : 
+      'ESSA É MINHA ESCALAÇÃO PARA O PRÓXIMO JOGO';
+
+    console.log('nextMatch:', nextMatch); // Debug 4
+    console.log('Texto do título:', titleText); // Debug 5
+
+    title.textContent = titleText;
     title.style.color = '#ffffff';
     title.style.fontSize = '28px';
     title.style.fontWeight = 'bold';
