@@ -4,7 +4,7 @@ import { api } from '../api/client';
 import { Match } from '../types';
 import { Calendar, MapPin, Clock, AlertCircle } from 'lucide-react';
 
-const CORINTHIANS_ID = 65; // Updated to correct Corinthians ID
+const CORINTHIANS_ID = 65;
 
 interface ChampionshipMatches {
   [key: string]: Match[];

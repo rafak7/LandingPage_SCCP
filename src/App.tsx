@@ -37,15 +37,14 @@ export function App() {
                 } />
                 <Route path="/team" element={<TeamInfo />} />
                 <Route path="/matches" element={<NextMatch />} />
-                {/* Adicione mais rotas conforme necessário */}
               </Routes>
             </div>
           </main>
 
           <footer className="border-t border-gray-800 py-8 mt-12">
             <div className="container mx-auto px-4 text-center">
-              <p className="text-gray-400 font-medium">© 2024 Sport Club Corinthians Paulista</p>
-              <p className="text-gray-500 text-sm mt-2">Fiel até o fim! 🖤</p>
+              <p className="text-gray-400 font-medium"> 2024 Sport Club Corinthians Paulista</p>
+              <p className="text-gray-500 text-sm mt-2">Fiel at o fim! </p>
             </div>
           </footer>
         </div>

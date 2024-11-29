@@ -61,13 +61,11 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       return;
     }
 
-    // Se clicou no mesmo jogador, desseleciona
     if (selectedPlayer.id === player.id) {
       setSelectedPlayer(null);
       return;
     }
 
-    // Se está tentando colocar um reserva em campo, verifica o limite de 11 jogadores
     if (!selectedPlayer.starter && player.starter) {
       const currentStarters = lineup.filter(p => p.starter).length;
       if (currentStarters >= 11) {
@@ -77,13 +75,11 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       }
     }
 
-    // Troca os jogadores e suas posições
     const updatedLineup = lineup.map(p => {
       if (p.id === selectedPlayer.id) {
         return { 
           ...p, 
           position: player.position,
-          // Mantém o status de titular/reserva original do jogador selecionado
           starter: player.starter ? true : false 
         };
       }
@@ -91,7 +87,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
         return { 
           ...p, 
           position: selectedPlayer.position,
-          // Mantém o status de titular/reserva original do outro jogador
           starter: selectedPlayer.starter ? true : false 
         };
       }
@@ -104,7 +99,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
 
   const handleDragStart = (player: Player, e: React.DragEvent) => {
     setDraggedPlayer(player);
-    // Define uma imagem transparente para o drag
     const img = new Image();
     img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     e.dataTransfer.setDragImage(img, 0, 0);
@@ -129,7 +123,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     e.preventDefault();
     if (!draggedPlayer || !dragPosition) return;
 
-    // Se o jogador não é titular e está sendo arrastado para o campo
     if (!draggedPlayer.starter) {
       const currentStarters = lineup.filter(p => p.starter).length;
       if (currentStarters >= 11) {
@@ -174,16 +167,13 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     printContainer.style.display = 'flex';
     printContainer.style.flexDirection = 'column';
     printContainer.style.alignItems = 'center';
+    printContainer.style.justifyContent = 'center';
     printContainer.style.gap = '16px';
 
-    // Adicionar o título com verificação segura
     const title = document.createElement('h1');
     const titleText = nextMatch?.['campeonato-brasileiro']?.[0]?.time_visitante?.nome_popular ? 
       `ESSA É MINHA ESCALAÇÃO PARA O JOGO CONTRA O ${nextMatch['campeonato-brasileiro'][0].time_visitante.nome_popular.toUpperCase()}` : 
       'ESSA É MINHA ESCALAÇÃO PARA O PRÓXIMO JOGO';
-
-    console.log('nextMatch:', nextMatch); // Debug 4
-    console.log('Texto do título:', titleText); // Debug 5
 
     title.textContent = titleText;
     title.style.color = '#ffffff';
@@ -196,14 +186,12 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     title.style.padding = '0 20px';
     printContainer.appendChild(title);
 
-    // Criar um novo container para o campo
     const fieldContainer = document.createElement('div');
     fieldContainer.style.width = '1100px';
     fieldContainer.style.height = '500px';
     fieldContainer.style.position = 'relative';
     fieldContainer.style.margin = '0 auto';
     
-    // Criar o campo diretamente (em vez de clonar)
     const field = document.createElement('div');
     field.style.width = '100%';
     field.style.height = '100%';
@@ -213,7 +201,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     field.style.borderRadius = '12px';
     field.style.overflow = 'hidden';
 
-    // Adicionar as linhas do campo
     field.innerHTML = `
       <div style="position: absolute; inset: 0; border: 2px solid rgba(255,255,255,0.5);"></div>
       <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.5);"></div>
@@ -222,7 +209,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       <div style="position: absolute; top: 50%; transform: translateY(-50%); right: 0; width: 96px; height: 192px; border: 2px solid rgba(255,255,255,0.5);"></div>
     `;
 
-    // Adicionar os jogadores
     starters.forEach(player => {
       let position = { x: 50, y: 50 };
       
@@ -271,7 +257,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     fieldContainer.appendChild(field);
     printContainer.appendChild(fieldContainer);
 
-    // Adicionar marca d'água
     const watermark = document.createElement('div');
     watermark.textContent = 'selectsccp.com';
     watermark.style.color = 'rgba(255,255,255,0.5)';
@@ -282,10 +267,8 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
     watermark.style.fontFamily = 'Arial, sans-serif';
     printContainer.appendChild(watermark);
 
-    // Adicionar ao body temporariamente
     document.body.appendChild(printContainer);
 
-    // Usar html2canvas para criar a imagem
     html2canvas(printContainer, {
       backgroundColor: '#000000',
       scale: 2,
@@ -295,10 +278,8 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       allowTaint: true,
       useCORS: true,
     }).then(canvas => {
-      // Remover o container temporário
       document.body.removeChild(printContainer);
 
-      // Criar o modal para preview
       const modal = document.createElement('div');
       modal.style.position = 'fixed';
       modal.style.top = '0';
@@ -313,7 +294,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       modal.style.padding = '20px';
       modal.style.zIndex = '9999';
 
-      // Adicionar preview da imagem
       const preview = canvas;
       preview.style.maxWidth = '90%';
       preview.style.maxHeight = '80vh';
@@ -321,13 +301,11 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       preview.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
       modal.appendChild(preview);
 
-      // Container para os botões
       const buttonContainer = document.createElement('div');
       buttonContainer.style.display = 'flex';
       buttonContainer.style.gap = '12px';
       buttonContainer.style.marginTop = '20px';
 
-      // Botão de download
       const downloadButton = document.createElement('button');
       downloadButton.textContent = 'Baixar Imagem';
       downloadButton.style.backgroundColor = '#18181b';
@@ -345,7 +323,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
         link.click();
       };
 
-      // Botão de fechar
       const closeButton = document.createElement('button');
       closeButton.textContent = 'Fechar';
       closeButton.style.backgroundColor = '#27272a';
@@ -363,7 +340,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
       modal.appendChild(buttonContainer);
       document.body.appendChild(modal);
 
-      // Adicionar hover effects nos botões
       [downloadButton, closeButton].forEach(button => {
         button.addEventListener('mouseover', () => {
           button.style.opacity = '0.9';
@@ -397,7 +373,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
         </button>
       </div>
       <div className="flex flex-col lg:flex-row gap-4">
-        {/* Campo */}
         <div className="flex-1 min-w-0 soccer-field-container">
           <div 
             className="relative w-full aspect-[16/10] bg-gradient-to-b from-zinc-900 to-black rounded-lg overflow-hidden"
@@ -405,20 +380,16 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
             onDragEnd={handleDragEnd}
             onDrop={handleDrop}
           >
-            {/* Linhas do campo */}
             <div className="absolute inset-0 border-2 border-white/50" />
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/50" />
             <div className="absolute w-36 h-36 border-2 border-white/50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full" />
             
-            {/* Áreas */}
             <div className="absolute top-1/2 -translate-y-1/2 left-0 w-24 h-48 border-2 border-white/50" />
             <div className="absolute top-1/2 -translate-y-1/2 right-0 w-24 h-48 border-2 border-white/50" />
             
-            {/* Jogadores titulares */}
             {starters.map((player) => {
               let position = { x: 50, y: 50 };
               
-              // Se este é o jogador sendo arrastado e temos uma posição de drag
               if (draggedPlayer?.id === player.id && dragPosition) {
                 position = dragPosition;
               } else if (player.position.startsWith('CUSTOM_')) {
@@ -451,7 +422,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
               );
             })}
 
-            {/* Visualização do drag */}
             {draggedPlayer && dragPosition && (
               <div
                 className="absolute pointer-events-none z-10"
@@ -470,7 +440,6 @@ export function SoccerField({ lineup: initialLineup }: { lineup: Player[] }) {
           </div>
         </div>
 
-        {/* Reservas */}
         <div className="w-full lg:w-72 bg-black rounded-lg p-4 shadow-xl">
           <h3 className="text-white font-medium mb-4 border-b border-white/10 pb-2">Reservas</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">

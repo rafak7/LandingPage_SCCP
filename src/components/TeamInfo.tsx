@@ -7,10 +7,9 @@ import CountUp from 'react-countup';
 import { SoccerField } from './SoccerField';
 import { useNavigate } from 'react-router-dom';
 
-const CORINTHIANS_ID = 65; // Updated to correct Corinthians ID
+const CORINTHIANS_ID = 65; 
 
 const fullSquad = [
-  // Titulares
   { id: '1', number: "1", name: "Hugo Souza", position: "GK", starter: true },
   { id: '2', number: "2", name: "Matheuzinho", position: "RB", starter: true },
   { id: '3', number: "25", name: "Cacá", position: "CB1", starter: true },
@@ -23,7 +22,6 @@ const fullSquad = [
   { id: '10', number: "9", name: "Yuri Alberto", position: "CF", starter: true },
   { id: '11', number: "11", name: "Ángel Romero", position: "LW", starter: true },
   
-  // Reservas
   { id: '12', number: "32", name: "M. Donelli", position: "GK", starter: false },
   { id: '13', number: "13", name: "Gustavo Henrique", position: "CB", starter: false },
   { id: '14', number: "3", name: "Félix Torres", position: "CB", starter: false },
@@ -53,7 +51,7 @@ export function TeamInfo() {
       const { data } = await api.get(`/times/${CORINTHIANS_ID}`);
       return data;
     },
-    staleTime: 1000 * 60 * 60, // Cache for 1 hour
+    staleTime: 1000 * 60 * 60,
   });
 
   if (isLoading) {
@@ -130,7 +128,6 @@ export function TeamInfo() {
 }
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  // Função para extrair o número do valor string
   const getNumericValue = (val: string) => {
     const num = parseFloat(val.replace('+', ''));
     return isNaN(num) ? 0 : num;

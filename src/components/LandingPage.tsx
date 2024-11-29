@@ -15,7 +15,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Video Background with Parallax Effect */}
       <div className="absolute inset-0 scale-110 transition-transform duration-1000">
         <video
           autoPlay
@@ -32,9 +31,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         </video>
       </div>
 
-      {/* Main Content */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
-        {/* Logo Icon */}
         <div className={`mb-8 animate-vibrate ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
           <img 
             src="/image/sccp.png" 
@@ -43,7 +40,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
           />
         </div>
 
-        {/* Title Group */}
         <div className="text-center mb-16">
           <h1 className="text-gray-200 text-2xl md:text-3xl font-light mb-4 animate-fade-in tracking-[0.2em] uppercase">
             Sport Club
@@ -58,7 +54,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
           </p>
         </div>
 
-        {/* Enter Button */}
         <div className={`transform transition-all duration-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <button
             onClick={onEnter}
@@ -72,7 +67,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
                 isHovered ? 'translate-x-1' : ''
               }`}
             />
-            {/* Button Glow Effect */}
             <div
               className={`absolute -inset-1 rounded-full blur-xl bg-white transition-all duration-500 ${
                 isHovered ? 'opacity-30' : 'opacity-0'
@@ -81,7 +75,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
           </button>
         </div>
 
-        {/* Bottom Text */}
         <div className={`absolute bottom-8 text-center ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000 delay-500`}>
           <p className="text-gray-400 text-sm tracking-widest">TODO PODEROSO TIMÃO</p>
         </div>
